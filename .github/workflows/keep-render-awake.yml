@@ -1,0 +1,32 @@
+name: Keep Render awake
+
+# Render's free tier spins the backend down after 15 minutes without traffic.
+# Scheduled workflows only run from the default branch and GitHub may delay them,
+# so ping well inside that window. This repo only exists to run this schedule.
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: keep-render-awake
+  cancel-in-progress: true
+
+jobs:
+  ping:
+    name: Ping backend
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      # Public endpoint that needs no session; override with a repository variable if the host changes.
+      PING_URL: ${{ vars.RENDER_PING_URL || 'https://cs3227-2610-mp3-by4h.onrender.com/api/auth/csrf' }}
+    steps:
+      - name: Ping
+        run: |
+          # A cold start can take about a minute, so allow long timeouts and a few retries.
+          curl --silent --show-error --fail --output /dev/null \
+            --write-out "HTTP %{http_code} in %{time_total}s\n" \
+            --max-time 90 --retry 3 --retry-delay 10 --retry-all-errors \
+            "$PING_URL"
