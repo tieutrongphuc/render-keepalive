@@ -1,6 +1,6 @@
 # render-keepalive
 
-Pings the CS3227 MP3 backend on Render every 10 minutes so the free instance does not spin down.
+Pings the CS3227 MP4 app (https://cs3227-2610-mp4.onrender.com/) on Render every 10 minutes so the free instance does not spin down.
 The workflow is in `.github/workflows/keep-render-awake.yml`.
 
 - To change the target, set a `RENDER_PING_URL` repository variable (Settings → Secrets and variables → Actions → Variables).
